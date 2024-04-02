@@ -9,6 +9,11 @@ Télécharger et extraire **fem2a_base.zip** dans un dossier de travail.
 Il s'agit du programme principal utilisé pour lancer les [tests](tests.md)
 et les [simulations](simus.md). Lisez-le pour comprendre son fonctionnement
 et pour savoir le modifier à chaque nouveau test ou simulation.
+Dans la fonction main : 
+- argc = nombre d'arguments où argument est un vecteur
+- arg c et argv se remplisssent automatiquement quand on éxecute le main 
+- argv[1] = 1 er argument
+- argv [2] = 2 e argument 
 
 - src/tests.h :
 
