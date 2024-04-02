@@ -5,6 +5,9 @@ obligés de vous en servir, mais vous devez développer des tests de validation
 de votre code quoi qu'il arrive.
 
 *Rappel : implémentez vos tests dans le fichier src/tests.h*
+Verifier que :
+Somme des poids = 1/2
+
 
 ### Vérification des quadratures fournies
 
