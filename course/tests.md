@@ -15,6 +15,7 @@ Somme des poids = 1/2
 Calculer à la main l'intégrale d'une fonction simple sur le triangle de
 référence (ex : $f(\xi,\eta)=1$) et comparer à la valeur retournée par les
 différentes quadratures.
+
 ie : quelque soit l'ordre du polynome, la somme des poids vaut 1/2 sachant que la fonction f sera toujours 1 
 ### Résultats sur le triangle 4 de *square.mesh*
 
