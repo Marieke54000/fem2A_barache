@@ -51,10 +51,22 @@ namespace FEM2A {
             return true;
         }
         
-        bool test_quadrature( int order)
+        /**
+        Ce test verifie que la somme des poids pour toute fonction f=1 vaut 1/2
+        **/
+        
+        bool test_quadrature( int order)  
         {
-            Quadrature quad0 = Quadrature::get_quadrature(order);
-            std :: cout << quad0.weight(order) << std :: endl;
+            Quadrature quad = Quadrature::get_quadrature(order);
+            std :: cout << quad.nb_points() << std :: endl;
+            double sum =0;
+            for (int i =0; i < quad.nb_points(); ++i ){
+            	std::cout << quad.point(i).x << " " // point a été défini commme une structure vertex (dans mesh.h)
+            		<< quad.point(i).y << std::endl;
+            	std::cout << quad.weight(i) << std::endl;
+            	sum = sum + quad.weight(i);
+            	}
+            std::cout << sum << std::endl;
             return true;
         }
     }
