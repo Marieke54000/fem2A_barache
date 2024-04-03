@@ -129,13 +129,13 @@ namespace FEM2A {
     /****************************************************************/
     /* Implementation of ElementMapping */
     /****************************************************************/
-    ElementMapping::ElementMapping( const Mesh& M, bool border, int i )
+    ElementMapping::ElementMapping( const Mesh& M, bool border, int i ) // méthode constructeur 
         : border_( border )
     {
         std::cout << "[ElementMapping] constructor for element " << i << " ";
         if ( border ) std::cout << "(border)";
         std::cout << '\n';
-        // TODO
+        border_ = border; // CE QUI A ETE RAJOUTER
     }
 
     vertex ElementMapping::transform( vertex x_r ) const
