@@ -69,12 +69,16 @@ namespace FEM2A {
             std::cout << sum << std::endl;
             return true;
         }
-        /** A TERMINER 
-       bool test_element_mapping(const Mesh& M, bool border, int i)
+       
+       bool test_element_mapping(border)
        {
-       		ElementMapping element(M, border,i);
+       	    Mesh mesh;
+       	    mesh.load("data/square_mesh");
+       	    
+       	    ElementMapping map (mesh, false,4);
+       	    std :: cout << border << std :: endl;
        		
-       **/
+    	}
    
     }
 }
