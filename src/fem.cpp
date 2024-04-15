@@ -132,39 +132,73 @@ namespace FEM2A {
     ElementMapping::ElementMapping( const Mesh& M, bool border, int i ) // méthode constructeur 
         : border_( border )
     {
-        std::cout << "[ElementMapping] constructor for element " << i << " ";
+        //std::cout << "[ElementMapping] constructor for element " << i << " ";
+        //std :: cout << '\n';
         if ( border ){
         	for ( int v = 0 ; v < 2 ; ++v ) vertices_.push_back (M.get_edge_vertex (i,v));
-        	for ( int v = 0 ; v < 2 ; ++v ) std :: cout << vertices_[v].x << " " << vertices_[v].y << std :: endl ;
+        	//for ( int v = 0 ; v < 2 ; ++v ) std :: cout << vertices_[v].x << " " << vertices_[v].y << std :: endl ;
         }
         else {
         	for ( int v = 0 ; v < 3 ; ++v ) vertices_.push_back(M.get_triangle_vertex(i,v));
-        	for ( int v = 0 ; v < 3; ++v ) std :: cout << vertices_[v].x << " " << vertices_[v].y << std :: endl ;
+        	//for ( int v = 0 ; v < 3; ++v ) std :: cout << vertices_[v].x << " " << vertices_[v].y << std :: endl ;
         }
         
     }
 
     vertex ElementMapping::transform( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] transform reference to world space" << '\n';
-        // TODO
+        //std::cout << "[ElementMapping] transform reference to world space" << '\n';
         vertex r ;
+        if ( border_ ){
+        	double phi0 = 1 - x_r.x ;
+        	double phi1 = x_r.x ;
+        	r.x = phi0 * vertices_[0].x+ phi1 * vertices_[1].x;
+        	r.y = phi0 * vertices_[0].y+ phi1 * vertices_[1].y;
+       }
+        else {
+        	double phi0 = 1 - x_r.x - x_r.y ;
+        	double phi1 = x_r.x ;
+        	double phi2 = x_r.y ; 
+        	r.x = phi0 * vertices_[0].x + phi1 * vertices_[1].x + phi2 * vertices_[2].x;
+        	r.y = phi0 * vertices_[0].y + phi1 * vertices_[1].y + phi2 * vertices_[2].y;
+        	
+       }
         return r ;
     }
 
     DenseMatrix ElementMapping::jacobian_matrix( vertex x_r ) const
     {
         std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
-        // TODO
         DenseMatrix J ;
+         if ( border_ ){
+         	J.set_size (2 , 1);     	
+        	J.set( 0 , 0 , - vertices_[0].x + vertices_[1].x);
+        	J.set( 0 , 1 , - vertices_[0].y + vertices_[1].y);
+       }
+        else {
+        	J.set_size (2 , 2);        	
+        	J.set( 0 , 0 , - vertices_[0].x +  vertices_[1].x);
+        	J.set( 0 , 1 , - vertices_[0].x +  vertices_[2].x);
+        	J.set ( 1 , 0 , - vertices_[0].y +  vertices_[1].y);
+        	J.set ( 1 , 1 , - vertices_[0].y +  vertices_[2].y);
+       }
         return J ;
     }
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
         std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
-        // TODO
-        return 0. ;
+        DenseMatrix J = jacobian_matrix (x_r);
+        double determinant;
+        if ( border_ ){        	
+         	determinant = sqrt ( J.get (0,0) * J.get (0,0) + J.get (0,1) * J.get (1,0));
+       }
+        else {        	
+        	determinant = J.det_2x2();
+       }
+       
+        return determinant;
+        
     }
 
     /****************************************************************/
@@ -174,28 +208,95 @@ namespace FEM2A {
         : dim_( dim ), order_( order )
     {
         std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
-        // TODO
     }
+        /*
+        bool SF_construct = true ;
+        if ( dim! = 1 && dim! = 2){
+        	std::cout << "ShapeFunctions are only implemented in 1D or 2D. " << std::endl;
+        	SF_construct=false;
+        }
+        if (order != 1 ){
+        	std::cout<< "Only order-1 ShapeFunctions are implemented " << std ::endl;
+        	SF_construct = false;
+        }
+        assert (SF_construct);
+    }*/
 
     int ShapeFunctions::nb_functions() const
     {
         std::cout << "[ShapeFunctions] number of functions" << '\n';
-        // TODO
-        return 0 ;
+        int nb_functions ;
+        if ( dim_ == 1 ){
+        	nb_functions = 2 ;
+        }
+        if( dim_ == 2){
+        	nb_functions = 3 ;
+        }
+       
+        return nb_functions ;
     }
 
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
-    {
+  {
         std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
-        // TODO
-        return 0. ; // should not be reached
+        double xi = x_r.x;
+        double eta = x_r.y;
+        if( dim_ == 1){
+        	switch (i){
+        		case (0):
+        			return(1- xi);
+   
+        		case (1) :
+        			return (xi);
+        			
+        			}
+        }
+        if ( dim_ == 2 ){
+        	switch (i){
+        		case (0) :
+        			return (1- xi-eta);
+        			
+        		case (1) :
+        			return (xi);
+        			
+        		case (2) :
+        			return (eta);
+        			
+        			}
+        } 
+        return 0.;       			        	        
     }
 
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
         std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
-        // TODO
         vec2 g ;
+        /*
+        double xi = x_r.x;
+        double eta = x_r.y;
+        if( dim_ == 1){
+        	switch (i){
+        		case (0):
+        			return(- x_r.x);
+   
+        		case (1) :
+        			return (x_r.);
+        			
+        			}
+        }
+        if ( dim_ == 2 ){
+        	switch (i){
+        		case (0) :
+        			return (1- xi-eta);
+        			
+        		case (1) :
+        			return (xi);
+        			
+        		case (2) :
+        			return (eta);
+        			
+        			}
+        } */
         return g ;
     }
 

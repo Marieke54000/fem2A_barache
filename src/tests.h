@@ -70,15 +70,34 @@ namespace FEM2A {
             return true;
         }
        
-       bool test_element_mapping(border)
+       bool test_element_mapping( bool border, int i )
        {
        	    Mesh mesh;
-       	    mesh.load("data/square_mesh");
+       	    mesh.load("data/square.mesh");
+       	    ElementMapping map = ElementMapping ( mesh,  border, i );
+       	    vertex x_r ; 
        	    
-       	    ElementMapping map (mesh, false,4);
-       	    std :: cout << border << std :: endl;
+       	    vertex r = map.transform(x_r);
+       	    std :: cout << r.x << " " << r.y << std :: endl ;       	    
+       	    DenseMatrix J_r = map.jacobian_matrix (x_r);
+       	    std :: cout << J_r.get (0,0) << " " << J_r.get (0,1) << '\n';
+       	    std :: cout << J_r.get (1,0) << " " << J_r.get (1,1) << '\n';
+       	    std :: cout << map.jacobian (x_r) << '\n';
+       	    return true ;
        		
     	}
+    	
+    	bool test_shape_functions (int dim, int order)
+    	{
+            ShapeFunctions fct = ShapeFunctions (dim , order);
+            std :: cout << "il y a " << fct.nb_functions() << " fonctions " << std :: endl ;           
+            int i;
+            vertex x_r ;
+            x_r.x = 0.2 ;
+       	    x_r.y = 0.4 ;
+            std :: cout << " la valeur de la fonction de forme en ce point est : " << fct.evaluate(0, x_r) << std ::endl;
+            return true;
+        }
    
     }
 }
