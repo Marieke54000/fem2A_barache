@@ -168,7 +168,7 @@ namespace FEM2A {
 
     DenseMatrix ElementMapping::jacobian_matrix( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
+        //std::cout << "[ElementMapping] compute jacobian matrix" << '\n';
         DenseMatrix J ;
          if ( border_ ){
          	J.set_size (2 , 1);     	
@@ -187,7 +187,7 @@ namespace FEM2A {
 
     double ElementMapping::jacobian( vertex x_r ) const
     {
-        std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
+        //std::cout << "[ElementMapping] compute jacobian determinant" << '\n';
         DenseMatrix J = jacobian_matrix (x_r);
         double determinant;
         if ( border_ ){        	
@@ -207,7 +207,7 @@ namespace FEM2A {
     ShapeFunctions::ShapeFunctions( int dim, int order )
         : dim_( dim ), order_( order )
     {
-        std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
+        //std::cout << "[ShapeFunctions] constructor in dimension " << dim << '\n';
     }
         /*
         bool SF_construct = true ;
@@ -224,7 +224,7 @@ namespace FEM2A {
 
     int ShapeFunctions::nb_functions() const
     {
-        std::cout << "[ShapeFunctions] number of functions" << '\n';
+        //std::cout << "[ShapeFunctions] number of functions" << '\n';
         int nb_functions ;
         if ( dim_ == 1 ){
         	nb_functions = 2 ;
@@ -238,7 +238,7 @@ namespace FEM2A {
 
     double ShapeFunctions::evaluate( int i, vertex x_r ) const
   {
-        std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
+        //std::cout << "[ShapeFunctions] evaluate shape function " << i << '\n';
         double xi = x_r.x;
         double eta = x_r.y;
         if( dim_ == 1){
@@ -269,34 +269,42 @@ namespace FEM2A {
 
     vec2 ShapeFunctions::evaluate_grad( int i, vertex x_r ) const
     {
-        std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
+        //std::cout << "[ShapeFunctions] evaluate gradient shape function " << i << '\n';
         vec2 g ;
-        /*
-        double xi = x_r.x;
-        double eta = x_r.y;
         if( dim_ == 1){
         	switch (i){
         		case (0):
-        			return(- x_r.x);
+        			g.x = -1;
+        			g.y = 0;
+        			break;
    
         		case (1) :
-        			return (x_r.);
+        			g.x = 1;
+        			g.y = 0;
+        			break;
         			
         			}
         }
         if ( dim_ == 2 ){
         	switch (i){
         		case (0) :
-        			return (1- xi-eta);
+        			g.x = -1;
+        			g.y = -1;
+        			break;
         			
         		case (1) :
-        			return (xi);
+        			g.x = 1;
+        			g.y = 0;
+        			break;
         			
         		case (2) :
-        			return (eta);
+        			g.x = 0;
+        			g.y = 1;
+        			break;
         			
         			}
-        } */
+        } 
+        
         return g ;
     }
 
@@ -307,12 +315,32 @@ namespace FEM2A {
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
         const Quadrature& quadrature,
-        double (*coefficient)(vertex),
+        double (*coefficient)(vertex), // pointeur de fonctions
         DenseMatrix& Ke )
     {
-        std::cout << "compute elementary matrix" << '\n';
-        // TODO
-    }
+        //std::cout << "compute elementary matrix" << '\n';        
+        Ke.set_size (reference_functions.nb_functions(),reference_functions.nb_functions());
+        for ( int i = 0 ; i < reference_functions.nb_functions()  ; ++i ){        	
+        	for ( int j = 0 ; j < reference_functions.nb_functions() ; ++j ){
+        		Ke.set(i,j,0.);
+        		for ( int q = 0 ; q < quadrature.nb_points() ; ++q ){
+        			vertex p_q = quadrature.point(q);
+        			double w_q = quadrature.weight(q);
+        			DenseMatrix J = elt_mapping.jacobian_matrix(p_q);
+        			DenseMatrix J_invert = J.invert_2x2();
+        			DenseMatrix J_invert_transpose = J_invert.transpose(); 
+        			vec2 gradi = J_invert_transpose.mult_2x2_2(reference_functions.evaluate_grad(i,p_q));
+        			vec2 gradj = J_invert_transpose.mult_2x2_2(reference_functions.evaluate_grad(j,p_q));
+   			      			       			        			        			
+        			Ke.add(i,j,w_q 
+        			           * coefficient(elt_mapping.transform(p_q))
+        			           * dot (gradi, gradj)
+        			           * elt_mapping.jacobian(p_q));        			        
+        			}      	          			
+        		}	
+        	}
+        }
+    
 
     void local_to_global_matrix(
         const Mesh& M,
@@ -320,10 +348,16 @@ namespace FEM2A {
         const DenseMatrix& Ke,
         SparseMatrix& K )
     {
-        std::cout << "Ke -> K" << '\n';
-        // TODO
+        std::cout << "Ke -> K" << '\n';               
+        for (int i = 0 ; i < Ke.height() ; ++i){  
+        	int i_global = M.get_triangle_vertex_index(t,i);
+        	for (int j = 0 ; j < Ke.height() ; ++j){        	      	
+        	        int j_global = M.get_triangle_vertex_index(t,j); 
+        		K.add(i_global, j_global,Ke.get(i,j));
+        	}
+        }              
     }
-
+/*
     void assemble_elementary_vector(
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
@@ -332,8 +366,19 @@ namespace FEM2A {
         std::vector< double >& Fe )
     {
         std::cout << "compute elementary vector (source term)" << '\n';
-        // TODO
-    }
+    	Fe.reserve (reference_functions.nb_functions());
+        for ( int i = 0 ; i < reference_functions.nb_functions()  ; ++i ){        	
+        	for ( int q = 0 ; q < quadrature.nb_points() ; ++q ){
+        		vertex p_q = quadrature.point(q);
+        		double w_q = quadrature.weight(q);   			      			       			        			        			
+        		Fe.push_back(w_q
+        		             * reference_functions.evaluate(i,p_q)
+        			     * source(elt_mapping.transform(p_q))        			     
+        			     * elt_mapping.jacobian(p_q));        			        
+        			}      	          			
+        		}	
+        	}
+        }*/
 
     void assemble_elementary_neumann_vector(
         const ElementMapping& elt_mapping_1D,
@@ -365,7 +410,16 @@ namespace FEM2A {
         std::vector< double >& F )
     {
         std::cout << "apply dirichlet boundary conditions" << '\n';
-        // TODO
+        // P = 10 000
+        // parcours de chauqe bord
+        double penalty_coefficient = 10000.;
+        for (int i = 0 ; i < M.nb_edges() ; ++i ){
+        	if (attribute_is_dirichlet[i]){
+        	// parcours chaque noeud 
+        		
+        	}
+        
+        }
     }
 
     void solve_poisson_problem(

@@ -75,8 +75,9 @@ namespace FEM2A {
        	    Mesh mesh;
        	    mesh.load("data/square.mesh");
        	    ElementMapping map = ElementMapping ( mesh,  border, i );
-       	    vertex x_r ; 
-       	    
+       	    vertex x_r ;  
+       	    x_r.x = 0.2 ;
+       	    x_r.y = 0.4 ;      	    
        	    vertex r = map.transform(x_r);
        	    std :: cout << r.x << " " << r.y << std :: endl ;       	    
        	    DenseMatrix J_r = map.jacobian_matrix (x_r);
@@ -96,6 +97,39 @@ namespace FEM2A {
             x_r.x = 0.2 ;
        	    x_r.y = 0.4 ;
             std :: cout << " la valeur de la fonction de forme en ce point est : " << fct.evaluate(0, x_r) << std ::endl;
+            vec2 g = fct.evaluate_grad(0, x_r);        
+            std :: cout << " la valeur du gradient de la fonction de forme en ce point est : " << g.x << " " << g.y << std ::endl;
+            return true;
+        }
+        
+        double unit_fct(vertex x_r) {
+	    	return 1;
+	    	}	    
+        bool test_assemble_elementary_matrix ( ){
+	    // teste avec la fonction constante=1
+	    
+	     	    
+            Mesh mesh;
+       	    mesh.load("data/square.mesh");
+       	    ElementMapping elt_mapping = ElementMapping ( mesh, false, 4 );
+       	    ShapeFunctions ref_functions = ShapeFunctions(2,1);
+       	    Quadrature quad = Quadrature::get_quadrature(2);
+       	    DenseMatrix Ke;
+       	    assemble_elementary_matrix(elt_mapping,ref_functions,quad,unit_fct,Ke);
+       	           	    
+            Ke.print();
+            
+            SparseMatrix K(mesh.nb_vertices());
+            local_to_global_matrix (mesh, 4, Ke, K);
+            
+            K.print();
+            
+            /*
+            assemble_elementary_vector(elt_mapping,ref_functions,quad,unit_fct,Fe);
+            
+            for (int i = 0; i < Fe.size() ; ++i){
+            	std::cout << Fe[i] << std :: endl;
+            };*/
             return true;
         }
    
