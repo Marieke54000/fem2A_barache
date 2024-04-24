@@ -117,19 +117,37 @@ namespace FEM2A {
        	    DenseMatrix Ke;
        	    assemble_elementary_matrix(elt_mapping,ref_functions,quad,unit_fct,Ke);
        	           	    
-            Ke.print();
+            //Ke.print();
             
             SparseMatrix K(mesh.nb_vertices());
             local_to_global_matrix (mesh, 4, Ke, K);
             
-            K.print();
+            //K.print();
+           
             
-            /*
+            return true;
+            }
+         
+         bool test_assemble_elementary_vector(){ 
+         
+            Mesh mesh;
+       	    mesh.load("data/square.mesh");
+       	    ElementMapping elt_mapping = ElementMapping ( mesh, false, 4 );
+       	    ShapeFunctions ref_functions = ShapeFunctions(2,1);
+       	    Quadrature quad = Quadrature::get_quadrature(2);
+           
+            // print Fe
+            std::vector< double >Fe ;
             assemble_elementary_vector(elt_mapping,ref_functions,quad,unit_fct,Fe);
-            
+            /*
             for (int i = 0; i < Fe.size() ; ++i){
             	std::cout << Fe[i] << std :: endl;
             };*/
+            std::vector< double >F(mesh.nb_vertices()) ;
+            local_to_global_vector(mesh,false,4,Fe,F);
+            for (int i = 0; i < F.size() ; ++i){
+            	std::cout << F[i] << std :: endl;
+            };
             return true;
         }
    

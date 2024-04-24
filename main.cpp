@@ -34,7 +34,8 @@ void run_tests()
     const bool t_quad =false;
     const bool t_elementmapping = false;
     const bool t_shapefunctions= false;
-    const bool t_assemble_elementary_matrix = true;
+    const bool t_assemble_elementary_matrix = false;
+    const bool t_assemble_elementary_vector = true;
 
     if( t_opennl ) test_opennl();
     if( t_lmesh ) Tests::test_load_mesh();
@@ -43,6 +44,7 @@ void run_tests()
     if (t_elementmapping) Tests::test_element_mapping(false,4);
     if (t_shapefunctions) Tests::test_shape_functions(1,1);
     if (t_assemble_elementary_matrix) Tests::test_assemble_elementary_matrix();
+    if (t_assemble_elementary_vector) Tests::test_assemble_elementary_vector();
 }
 
 void run_simu()
@@ -54,7 +56,9 @@ void run_simu()
         || flag_is_used( "--verbose", arguments );
 
     if( simu_pure_dirichlet ) {
-        Simu::pure_dirichlet_pb("data/square.mesh", verbose);
+        //Simu::pure_dirichlet_pb("data/square_fine.mesh", verbose);
+        //Simu::dirichlet_pb_ts("data/square.mesh", verbose);
+        Simu::pb_sinus_bump("data/square_fine.mesh", verbose);
     }
 }
 

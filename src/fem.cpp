@@ -348,7 +348,7 @@ namespace FEM2A {
         const DenseMatrix& Ke,
         SparseMatrix& K )
     {
-        std::cout << "Ke -> K" << '\n';               
+        // std::cout << "Ke -> K" << '\n';               
         for (int i = 0 ; i < Ke.height() ; ++i){  
         	int i_global = M.get_triangle_vertex_index(t,i);
         	for (int j = 0 ; j < Ke.height() ; ++j){        	      	
@@ -357,7 +357,7 @@ namespace FEM2A {
         	}
         }              
     }
-/*
+
     void assemble_elementary_vector(
         const ElementMapping& elt_mapping,
         const ShapeFunctions& reference_functions,
@@ -365,21 +365,21 @@ namespace FEM2A {
         double (*source)(vertex),
         std::vector< double >& Fe )
     {
-        std::cout << "compute elementary vector (source term)" << '\n';
-    	Fe.reserve (reference_functions.nb_functions());
-        for ( int i = 0 ; i < reference_functions.nb_functions()  ; ++i ){        	
-        	for ( int q = 0 ; q < quadrature.nb_points() ; ++q ){
-        		vertex p_q = quadrature.point(q);
-        		double w_q = quadrature.weight(q);   			      			       			        			        			
-        		Fe.push_back(w_q
-        		             * reference_functions.evaluate(i,p_q)
-        			     * source(elt_mapping.transform(p_q))        			     
-        			     * elt_mapping.jacobian(p_q));        			        
-        			}      	          			
+        //std::cout << "compute elementary vector (source term)" << '\n';
+        for ( int i = 0 ; i < reference_functions.nb_functions(); ++i ){ 
+        	Fe.push_back(0);
+        	for  ( int q = 0 ; q < quadrature.nb_points(); ++q ){       	
+        	vertex p_q = quadrature.point(q);
+        	double w_q = quadrature.weight(q);   			      			       			        			        			
+        	Fe[i]+=w_q
+        		      * reference_functions.evaluate(i,p_q)
+        		      * source(elt_mapping.transform(p_q))        			     
+        		      * elt_mapping.jacobian(p_q);      			        
+        			     	          			
         		}	
         	}
-        }*/
-
+        
+}
     void assemble_elementary_neumann_vector(
         const ElementMapping& elt_mapping_1D,
         const ShapeFunctions& reference_functions_1D,
@@ -388,7 +388,20 @@ namespace FEM2A {
         std::vector< double >& Fe )
     {
         std::cout << "compute elementary vector (neumann condition)" << '\n';
-        // TODO
+        
+        /*
+         for ( int i = 0 ; i < reference_functions_1D.nb_functions(); ++i ){ 
+        	Fe.push_back(0);
+        	for  ( int q = 0 ; q < quadrature.nb_points(); ++q ){       	
+        	vertex p_q = quadrature.point(q);
+        	double w_q = quadrature.weight(q);   			      			       			        			        			
+        	Fe[i]+=w_q
+        		      * reference_functions.evaluate(i,p_q)
+        		      * source(elt_mapping.transform(p_q))        			     
+        		      * elt_mapping.jacobian(p_q);      			        
+        			     	          			
+        		}	
+        	}*/
     }
 
     void local_to_global_vector(
@@ -398,10 +411,21 @@ namespace FEM2A {
         std::vector< double >& Fe,
         std::vector< double >& F )
     {
-        std::cout << "Fe -> F" << '\n';
-        // TODO
+        //std::cout << "Fe -> F" << '\n';
+        if (border) {
+        	for (int i_local = 0 ; i_local < Fe.size() ; ++i_local){
+        		F[M.get_edge_vertex_index(i,i_local)] += Fe[i_local];
+        	}
+        }
+        else {
+        	for (int i_local = 0 ; i_local < Fe.size() ; ++i_local){
+        		F[M.get_triangle_vertex_index(i,i_local)] += Fe[i_local];
+        	} 
+        }
+                      
     }
 
+     
     void apply_dirichlet_boundary_conditions(
         const Mesh& M,
         const std::vector< bool >& attribute_is_dirichlet, /* size: nb of attributes */
@@ -409,14 +433,24 @@ namespace FEM2A {
         SparseMatrix& K,
         std::vector< double >& F )
     {
-        std::cout << "apply dirichlet boundary conditions" << '\n';
+        //std::cout << "apply dirichlet boundary conditions" << '\n';
+        std :: vector<bool> processed_vertices(values.size(),false) ; // stocke booléens des vertices dèjà traités 
         // P = 10 000
-        // parcours de chauqe bord
+        // parcours de chaque bord
         double penalty_coefficient = 10000.;
-        for (int i = 0 ; i < M.nb_edges() ; ++i ){
-        	if (attribute_is_dirichlet[i]){
+        for (int edge = 0 ; edge < M.nb_edges() ; ++edge ){
+        	int edge_attribute = M.get_edge_attribute (edge);
+        	if (attribute_is_dirichlet[edge_attribute]){
         	// parcours chaque noeud 
-        		
+        		for (int v = 0; v < 2 ; ++v ){
+        			int vertex_index = M.get_edge_vertex_index(edge,v);
+        			if ( !processed_vertices[vertex_index]) {
+        				processed_vertices[vertex_index]=true;
+        				K.add (vertex_index,vertex_index, penalty_coefficient);
+        				F[vertex_index]+=penalty_coefficient*values[vertex_index];
+        			}
+        			
+        		}
         	}
         
         }
