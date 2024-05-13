@@ -58,7 +58,9 @@ void run_simu()
     if( simu_pure_dirichlet ) {
         //Simu::pure_dirichlet_pb("data/square_fine.mesh", verbose);
         //Simu::dirichlet_pb_ts("data/square.mesh", verbose);
-        Simu::pb_sinus_bump("data/square_fine.mesh", verbose);
+        //Simu::pb_sinus_bump("data/square_fine.mesh", verbose);
+        //Simu::sol_exacte("data/square_fine.mesh", verbose);
+        Simu::ecart_solnum_solanalyt("data/square_fine.mesh", verbose);
     }
 }
 
