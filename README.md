@@ -30,7 +30,9 @@ Contient l'implémentation des méthodes des éléments finis.
 
 # sous Linux 
 
-Pour compiler, rentrer la commande **make**, et pour éxecuter, rentrer la commande **./build/fem2a**. Attention à bien se placer dans le dossier **Documents/fem2A_nom**.
+Pour compiler, se placer dans le Terminal et rentrer la commande **make**, et pour éxecuter, rentrer la commande **./build/fem2a**. Attention à bien se placer dans le dossier **Documents/fem2A_nom**.
+
+Medit permet d'afficher le maillage et la touche **m** d'afficher la simulation. Afin d'afficher le maillage, se placer dans les dossier contenant les **.mesh** et **.bb**, créés lors de l'exécution. 
   
 #### Contact
 
