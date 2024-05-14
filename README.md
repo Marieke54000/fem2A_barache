@@ -10,9 +10,13 @@ Contient la définition des différents tests qui seront appelés dans main.cpp.
 - Les différentes tests sont :
   
   test-quadrature : permet de tester la structure Quadrature
+  
   test_elemnt_mapping : teste les méthodes de la classe ElementMapping, qui permet de transfomer les coordonnées de l'élement de réference vers l'espace global, calculer le jacobien du mapping ainsi que son déterminant
+  
   test_shape_functions : teste la classe ShapeFunctions, et renseigne le nombre de fonctions de forme en fonction de l'élément, l'expression des fonctions de forme ainsi que leur gradient
+  
   test_assemble_elementary_matrix : teste la méthode assemble_elementary_matrix, qui construit Ke
+  
   test_assemble_elementary_vector : teste la méthode assemble_elementary_vector, qui construit Fe
 
 - src/simu.h :
