@@ -1,11 +1,24 @@
 # Éléments Finis en C++
+- main.cpp :
+  Programme principal permettant de lancer les tests ainsi que les simulations.
+  
+- src/tests.h :
+Contient la définition des différents tests qui seront appelés dans main.cpp. 
+- Les différentes tests sont :
+  test-quadrature : permet de tester la structure Quadrature
+  test_elemnt_mapping : teste les méthodes de la classe ElementMapping, qui permet de transfomer les coordonnées de l'élement de réference vers l'espace global, calculer le jacobien du mapping ainsi que son déterminant
+  test_shape_functions : teste la classe ShapeFunctions, et renseigne le nombre de fonctions de forme en fonction de l'élément, l'expression des fonctions de forme ainsi que leur gradient
+  test_assemble_elementary_matrix : teste la méthode assemble_elementary_matrix, qui construit Ke
+  test_assemble_elementary_vector : teste la méthode assemble_elementary_vector, qui construit Fe
 
-#### Objectif
+- src/simu.h :
+Contient la définition des différentes simulations qui seront appelées dans
+main.cpp.
 
-Écrire [un code aux éléments finis en C++](course/code.md) pour résoudre des 
-[problèmes de Poisson](course/poisson.md) 2D avec des éléments triangulaires
-linéaires. 
+- src/fem.cpp :
+Contient l'implémentation des méthodes des éléments finis.
 
+  
 #### Contact
 
 Paul Cupillard : paul.cupillard@univ-lorraine.fr
