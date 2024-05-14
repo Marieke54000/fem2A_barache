@@ -1,6 +1,6 @@
 # Éléments Finis en C++
 - main.cpp :
-- 
+  
   Programme principal permettant de lancer les tests ainsi que les simulations.
   
 - src/tests.h :
@@ -28,6 +28,9 @@ main.cpp.
   
 Contient l'implémentation des méthodes des éléments finis.
 
+# sous Linux 
+
+Pour compiler, rentrer la commande **make**, et pour éxecuter, rentrer la commande **./build/fem2a**. Attention à bien se placer dans le dossier **Documents/fem2A_nom**.
   
 #### Contact
 
