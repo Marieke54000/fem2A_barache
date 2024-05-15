@@ -1,0 +1,12 @@
+/home/ring/lib/libMedit3D.so
+/home/ring/include/chrono.h
+/home/ring/include/eigenv.h
+/home/ring/include/extern.h
+/home/ring/include/grafic.h
+/home/ring/include/image.h
+/home/ring/include/libmesh5.h
+/home/ring/include/medit.h
+/home/ring/include/memory.h
+/home/ring/include/mesh.h
+/home/ring/include/sproto.h
+/home/ring/bin/medit
